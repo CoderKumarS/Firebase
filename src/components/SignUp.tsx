@@ -17,7 +17,7 @@ function SignUp() {
     color: "",
   });
   let target, value;
-  const handleUser = (e) => {
+  const handleUser = (e: React.ChangeEvent<HTMLInputElement>) => {
     target = e.target.id;
     value = e.target.value;
     setUser({ ...user, [target]: value });
@@ -53,7 +53,7 @@ function SignUp() {
         email: user.email,
       });
       setUser({ name: "", email: "", password: "" });
-    } catch (error) {
+    } catch (error: any) {
       setAlert({
         ...alert,
         visible: true,

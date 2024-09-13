@@ -1,43 +1,67 @@
 import React, { useState, useEffect } from "react";
+import { useFirebase } from "../module/firebase";
 import Alert from "../test/Alert";
 import Button from "../test/Button";
 import { Form } from "react-bootstrap";
-function LogIn() {
-  const [user, setUser] = useState({
+
+interface UserState {
+  email: string;
+  password: string;
+}
+
+interface AlertState {
+  visible: boolean;
+  message: string;
+  color: string;
+}
+
+const LogIn: React.FC = () => {
+  const firebase = useFirebase();
+  const [user, setUser] = useState<UserState>({
     email: "",
     password: "",
   });
-  const [alert, setAlert] = useState({
+  const [alert, setAlert] = useState<AlertState>({
     visible: false,
     message: "",
     color: "",
   });
-  let target, value;
-  const handleUser = (e) => {
-    target = e.target.id;
-    value = e.target.value;
-    setUser({ ...user, [target]: value });
+
+  const handleUser = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const { id, value } = e.target;
+    setUser(prevState => ({ ...prevState, [id]: value }));
   };
-  if (alert.visible) {
-    setTimeout(() => {
-      setAlert({ ...alert, visible: false });
-    }, 5000);
-  }
-  const handleLogIn = async () => {
-    if (user.email == "" || user.password == "") {
+
+  useEffect(() => {
+    if (alert.visible) {
+      const timer = setTimeout(() => {
+        setAlert(prevAlert => ({ ...prevAlert, visible: false }));
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [alert.visible]);
+
+  const handleLogIn = async (): Promise<void> => {
+    if (user.email === "" || user.password === "") {
       setAlert({
-        ...alert,
         visible: true,
         message: "Email and Password are required",
         color: "danger",
       });
       return;
     }
-    try {
 
-    } catch (error) {
+    try {
+      const auth = await firebase.signinUserWithEmailAndPassword(user.email, user.password);
       setAlert({
-        ...alert,
+        visible: true,
+        message: `${auth.user.email} Signed in successfully`,
+        color: "success",
+      });
+      setUser({ email: "", password: "" });
+    } catch (error: any) {
+      setAlert({
         visible: true,
         message: error.message,
         color: "danger",
@@ -45,11 +69,12 @@ function LogIn() {
       console.log(error);
     }
   };
+
   return (
-    <div className="d-flex flex-column align-items-center justify-content-center postion-relative">
+    <div className="d-flex flex-column align-items-center justify-content-center position-relative">
       {alert.visible && (
         <Alert
-          onClose={() => setAlert({ ...alert, visible: false })}
+          onClose={() => setAlert(prevAlert => ({ ...prevAlert, visible: false }))}
           color={alert.color}
         >
           {alert.message}
@@ -88,6 +113,6 @@ function LogIn() {
       </Form>
     </div>
   );
-}
+};
 
 export default LogIn;
