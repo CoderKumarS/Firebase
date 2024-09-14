@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { Routes, Route } from "react-router-dom";
-import ListGroup from "./test/ListGroup";
-import Contact from "./components/Contact";
-import SignUp from "./components/SignUp";
-import LogIn from "./components/LogIn";
+import ListGroup from "./components/ListGroup";
+import Contact from "./pages/Contact";
+import SignUp from "./pages/SignUp";
+import LogIn from "./pages/LogIn";
+import Chat from "./pages/Chat";
 const items = [
   "New York",
   "Los Angeles",
@@ -21,8 +22,9 @@ function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<LogIn />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/" element={<Chat />} />
         <Route
-          path="/"
+          path="/list"
           element={<ListGroup items={items} heading={heading} />}
         />
       </Routes>

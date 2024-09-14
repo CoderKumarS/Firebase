@@ -10,7 +10,8 @@ interface Props {
     | "warning"
     | "info"
     | "light"
-    | "dark";
+    | "dark"
+    | string;
   onClose: () => void;
 }
 function Alert({ children, onClose, color }: Props) {

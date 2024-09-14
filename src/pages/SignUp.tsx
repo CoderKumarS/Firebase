@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Form } from "react-bootstrap";
 import { useFirebase } from "../module/firebase";
-import Alert from "../test/Alert";
-import Button from "../test/Button";
+import Alert from "../components/Alert";
+import Button from "../components/Button";
 
 function SignUp() {
   const firebase = useFirebase();

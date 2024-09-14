@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useFirebase } from "../module/firebase";
-import Alert from "../test/Alert";
-import Button from "../test/Button";
+import Alert from "../components/Alert";
+import Button from "../components/Button";
 import { Form } from "react-bootstrap";
 
 interface UserState {
@@ -29,13 +29,13 @@ const LogIn: React.FC = () => {
 
   const handleUser = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { id, value } = e.target;
-    setUser(prevState => ({ ...prevState, [id]: value }));
+    setUser((prevState) => ({ ...prevState, [id]: value }));
   };
 
   useEffect(() => {
     if (alert.visible) {
       const timer = setTimeout(() => {
-        setAlert(prevAlert => ({ ...prevAlert, visible: false }));
+        setAlert((prevAlert) => ({ ...prevAlert, visible: false }));
       }, 5000);
 
       return () => clearTimeout(timer);
@@ -53,7 +53,10 @@ const LogIn: React.FC = () => {
     }
 
     try {
-      const auth = await firebase.signinUserWithEmailAndPassword(user.email, user.password);
+      const auth = await firebase.signinUserWithEmailAndPassword(
+        user.email,
+        user.password
+      );
       setAlert({
         visible: true,
         message: `${auth.user.email} Signed in successfully`,
@@ -74,7 +77,9 @@ const LogIn: React.FC = () => {
     <div className="d-flex flex-column align-items-center justify-content-center position-relative">
       {alert.visible && (
         <Alert
-          onClose={() => setAlert(prevAlert => ({ ...prevAlert, visible: false }))}
+          onClose={() =>
+            setAlert((prevAlert) => ({ ...prevAlert, visible: false }))
+          }
           color={alert.color}
         >
           {alert.message}
