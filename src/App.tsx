@@ -5,6 +5,7 @@ import Contact from "./pages/Contact";
 import SignUp from "./pages/SignUp";
 import LogIn from "./pages/LogIn";
 import Chat from "./pages/Chat";
+import NavBar from "./components/NavBar";
 const items = [
   "New York",
   "Los Angeles",
@@ -17,18 +18,19 @@ const items = [
 const heading = "Cities";
 function App() {
   return (
-    <>
+    <div className="absolute w-full h-full">
+      <NavBar />
       <Routes>
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<LogIn />} />
         <Route path="/contact" element={<Contact />} />
-        <Route path="/" element={<Chat />} />
+        <Route path="/chat" element={<Chat />} />
         <Route
-          path="/list"
+          path="/"
           element={<ListGroup items={items} heading={heading} />}
         />
       </Routes>
-    </>
+    </div>
   );
 }
 

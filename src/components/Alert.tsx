@@ -20,7 +20,7 @@ function Alert({ children, onClose, color }: Props) {
       className={
         "alert alert-" +
         color +
-        " alert-dismissible fade show m-2 position-absolute top-0 start-50 translate-middle-x"
+        " alert-dismissible fade show m-2 position-absolute top-6 start-50 translate-middle-x"
       }
       role="alert"
     >
