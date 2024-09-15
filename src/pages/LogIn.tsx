@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useFirebase } from "../module/firebase";
+import { useNavigate } from "react-router-dom";
 import Alert from "../components/Alert";
 import Button from "../components/Button";
 import { Form } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
+import reactLogo from "./assets/react.svg";
 
 interface UserState {
   email: string;
@@ -18,6 +20,7 @@ interface AlertState {
 
 const LogIn: React.FC = () => {
   const firebase = useFirebase();
+  const navigate = useNavigate();
   const [user, setUser] = useState<UserState>({
     email: "",
     password: "",
@@ -42,7 +45,11 @@ const LogIn: React.FC = () => {
       return () => clearTimeout(timer);
     }
   }, [alert.visible]);
-
+  useEffect(() => {
+    if (firebase.isLoggedIn) {
+      navigate("/");
+    }
+  }, [firebase, navigate]);
   const handleLogIn = async (): Promise<void> => {
     if (user.email === "" || user.password === "") {
       setAlert({
@@ -88,10 +95,11 @@ const LogIn: React.FC = () => {
       )}
       <div className="row w-75 ">
         <div className="container-sm col">
-          <img
+          <img src={reactLogo} alt="HeroImage" />
+          {/* <img
             src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_uiD7zTYPmlSgcMcd12jHp72vMysESxhG-eKa_U40SCqsN14sMzayGZEOLbWoG1m6PHEgxyhJuD4Az_vzRyMuj3GW04oI713xlnqmsq5hzGpFH1Co_DLcCqjNUwAOhtGBj9zaFB12TJJ6NdyUDk1gNmk1DS7BsJSB7MDQIJC30dm6FeL8ibn-vCzg=w919-h516-p-k-no-nu"
             alt="HeroImage"
-          />
+          /> */}
           <h1 className="pb-2 text-left border-bottom border-primary">
             Log In
           </h1>
