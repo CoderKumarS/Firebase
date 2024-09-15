@@ -6,6 +6,7 @@ import SignUp from "./pages/SignUp";
 import LogIn from "./pages/LogIn";
 import Chat from "./pages/Chat";
 import NavBar from "./components/NavBar";
+import Publish from "./pages/Publish";
 const items = [
   "New York",
   "Los Angeles",
@@ -25,6 +26,7 @@ function App() {
         <Route path="/login" element={<LogIn />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/chat" element={<Chat />} />
+        <Route path="/publish" element={<Publish />} />
         <Route
           path="/"
           element={<ListGroup items={items} heading={heading} />}

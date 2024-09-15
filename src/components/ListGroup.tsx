@@ -1,4 +1,4 @@
-import React, { MouseEvent, useState } from "react";
+import React, { useState } from "react";
 
 interface Props {
   items: string[];
@@ -6,9 +6,6 @@ interface Props {
 }
 function ListGroup({ items, heading }: Props) {
   const message = items.length === 0 ? <p>No item found</p> : null;
-  // const handleClick = (e: MouseEvent) => {
-  //   console.log(e);
-  // };
   let [selectedIndex, setSelectedIndex] = useState(0);
 
   return (

@@ -14,6 +14,8 @@ import {
   User,
 } from "firebase/auth";
 import { getDatabase, ref, set } from "firebase/database";
+import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { getStorage, ref as storageRef, uploadBytes } from "firebase/storage";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -30,7 +32,11 @@ const firebaseConfig = {
 const firebaseApp = initializeApp(firebaseConfig);
 const firebaseAuth = getAuth(firebaseApp);
 const database = getDatabase(firebaseApp);
-const FirebaseContext = createContext<any>(null); // createContext with any as initial type
+const firestore = getFirestore(firebaseApp);
+const storage = getStorage(firebaseApp);
+
+// createContext with any as initial type
+const FirebaseContext = createContext<any>(null);
 
 // Custom hook to use Firebase context
 export const useFirebase = () => useContext(FirebaseContext);
@@ -75,7 +81,28 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
   const putData = (key: string, data: any) => {
     set(ref(database, key), data);
   };
-
+  const putDataFirestore = async (
+    name: string,
+    isbNumber: string,
+    price: number,
+    coverPic: any
+  ) => {
+    const imgRef = storageRef(
+      storage,
+      `publish/images/${Date.now()}-${coverPic}`
+    );
+    const uploadResult = await uploadBytes(imgRef, coverPic);
+    return await addDoc(collection(firestore, "books"), {
+      name,
+      isbNumber,
+      price,
+      coverPic: uploadResult.ref.fullPath,
+      userId: user?.uid,
+      userEmail: user?.email,
+      displayName: user?.displayName,
+      photoURL: user?.photoURL,
+    });
+  };
   // Check if user is logged in
   const isLoggedIn = !!user;
 
@@ -86,6 +113,7 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
         signupUserWithEmailAndPassword,
         signinUserWithEmailAndPassword,
         putData,
+        putDataFirestore,
         isLoggedIn,
       }}
     >
