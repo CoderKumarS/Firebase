@@ -5,7 +5,6 @@ import Alert from "../components/Alert";
 import Button from "../components/Button";
 import { Form } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
-import reactLogo from "./assets/react.svg";
 
 interface UserState {
   email: string;
@@ -47,7 +46,7 @@ const LogIn: React.FC = () => {
   }, [alert.visible]);
   useEffect(() => {
     if (firebase.isLoggedIn) {
-      navigate("/");
+      navigate("/profile");
     }
   }, [firebase, navigate]);
   const handleLogIn = async (): Promise<void> => {
@@ -77,7 +76,6 @@ const LogIn: React.FC = () => {
         message: error.message,
         color: "danger",
       });
-      console.log(error);
     }
   };
 
@@ -94,20 +92,22 @@ const LogIn: React.FC = () => {
         </Alert>
       )}
       <div className="row w-75 ">
-        <div className="container-sm col">
-          <img src={reactLogo} alt="HeroImage" />
-          {/* <img
-            src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_uiD7zTYPmlSgcMcd12jHp72vMysESxhG-eKa_U40SCqsN14sMzayGZEOLbWoG1m6PHEgxyhJuD4Az_vzRyMuj3GW04oI713xlnqmsq5hzGpFH1Co_DLcCqjNUwAOhtGBj9zaFB12TJJ6NdyUDk1gNmk1DS7BsJSB7MDQIJC30dm6FeL8ibn-vCzg=w919-h516-p-k-no-nu"
+        <div className="container-sm col relative">
+          <img
+            src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_v38iuAxhM7IUI-KbsEeiNmLgUyiw3_SfW3CI6x9OY4cTjUv8MX_LivgjkUHM60GLzq_UboTuKaT0YoWyop0Kff-JBsbMEXfsyyBPPe7K0wXtG7Q9YTNOzmi3PV99DxPO4oyQSHQwA=w919-h516-p-k-no-nu"
             alt="HeroImage"
-          /> */}
-          <h1 className="pb-2 text-left border-bottom border-primary">
-            Log In
-          </h1>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eveniet
-            nulla nisi minima aliquid officia nobis ea repudiandae earum animi
-            quasi?
-          </p>
+            className="w-full h-full object-cover rounded-md"
+          />
+          <div className="absolute bottom-0 left-0 mx-5">
+            <h1 className="pb-2 text-left border-bottom border-primary text-white">
+              Log In
+            </h1>
+            <p className="text-white">
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eveniet
+              nulla nisi minima aliquid officia nobis ea repudiandae earum animi
+              quasi?
+            </p>
+          </div>
         </div>
         <Form className="p-2 border border-primary rounded bg-info bg-opacity-10 container-sm col w-75">
           <Form.Group controlId="email">

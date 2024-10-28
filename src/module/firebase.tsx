@@ -11,9 +11,10 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   onAuthStateChanged,
+  signOut,
   User,
 } from "firebase/auth";
-import { getDatabase, ref, set } from "firebase/database";
+import { getDatabase, ref, set, get, child } from "firebase/database";
 import { getFirestore, collection, addDoc } from "firebase/firestore";
 import { getStorage, ref as storageRef, uploadBytes } from "firebase/storage";
 
@@ -81,6 +82,19 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
   const putData = (key: string, data: any) => {
     set(ref(database, key), data);
   };
+  const getData = async (key: string) => {
+    try {
+      const snapshot = await get(child(ref(database), "users/" + key));
+      if (snapshot.exists()) {
+        return snapshot.val();
+      } else {
+        return "";
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      return "";
+    }
+  };
   const putDataFirestore = async (
     name: string,
     isbNumber: string,
@@ -104,8 +118,9 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
     });
   };
   // Check if user is logged in
-  const isLoggedIn = !!user;
-
+  const isLoggedIn = user ? true : false;
+  //logged out user
+  const signOutUser = () => signOut(firebaseAuth);
   // Provide context values to children components
   return (
     <FirebaseContext.Provider
@@ -113,8 +128,11 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
         signupUserWithEmailAndPassword,
         signinUserWithEmailAndPassword,
         putData,
+        getData,
         putDataFirestore,
         isLoggedIn,
+        signOutUser,
+        user,
       }}
     >
       {children}

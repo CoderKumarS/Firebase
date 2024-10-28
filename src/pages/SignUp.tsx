@@ -42,15 +42,16 @@ function SignUp() {
         user.email,
         user.password
       );
+      firebase.putData("users/" + auth.user.uid, {
+        name: user.name,
+        email: user.email,
+      });
+
       setAlert({
         ...alert,
         visible: true,
         message: auth.user.email + " Signed up successfully",
         color: "success",
-      });
-      firebase.putData("users/" + user.name, {
-        name: user.name,
-        email: user.email,
       });
       setUser({ name: "", email: "", password: "" });
     } catch (error: any) {

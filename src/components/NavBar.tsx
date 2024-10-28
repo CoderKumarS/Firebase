@@ -2,30 +2,34 @@ import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { Form, Button } from "react-bootstrap";
 import "../App.css";
+import Logo from "/logo.png";
+import { useFirebase } from "../module/firebase";
+
 const NavBar = () => {
+  const firebase = useFirebase();
   const links = [
     { path: "/", label: "Home" },
-    { path: "/login", label: "Login" },
-    { path: "/signup", label: "SignUp" },
     { path: "/contact", label: "Contact" },
     { path: "/chat", label: "Chat" },
     { path: "/publish", label: "Publish" },
   ];
+  if (!firebase.isLoggedIn) {
+    links.push({ path: "/login", label: "Login" });
+    links.push({ path: "/signup", label: "SignUp" });
+  } else {
+    links.push({ path: "/profile", label: "Profile" });
+  }
   let [selectedIndex, setSelectedIndex] = useState(0);
   const [search, setSearch] = useState("");
   const handleClick = (index: number) => {
     setSelectedIndex(index);
   };
   return (
-    <nav className="bg-gray-800 sticky top-0">
+    <nav className="bg-gray-800 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 ">
         <div className="relative flex items-center justify-evenly h-16">
           <div className="basis-1/12 flex items-center content-start">
-            <img
-              src="https://tailwindui.com/img/logos/workflow-mark-indigo-500.svg"
-              alt="Logo"
-              className="h-8 w-8"
-            />
+            <img src={Logo} alt="Logo" className="h-8 w-8 rounded-3xl" />
           </div>
           <div className="basis-7/12 flex items-center justify-center">
             <div className="hidden sm:block ">
