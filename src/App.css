@@ -1,3 +1,28 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+#cursorCircle {
+    z-index: 9998;
+    mix-blend-mode: multiply;
+    pointer-events: none;
+    left: -100px;
+    top: -100px;
+    background: rgba(12, 219, 234, 0.61);
+    border-radius: 50px;
+    box-shadow: 0 4px 30px rgba(0, 187, 255, 0.468);
+    backdrop-filter: blur(2.2px);
+    -webkit-backdrop-filter: blur(2.2px);
+}
+
+#cursorCC {
+    z-index: 9999;
+    mix-blend-mode: difference;
+    pointer-events: none;
+    left: -85px;
+    top: -85px;
+}
+
+#svgCursor {
+    z-index: 9997;
+}
