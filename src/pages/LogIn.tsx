@@ -53,6 +53,10 @@ const LogIn: React.FC = () => {
     setIsLoading(true);
     try {
       const auth = await firebase.signinUserWithGoogle();
+      await firebase.putData("users/" + auth.user.uid, {
+        name: auth.user.displayName,
+        email: auth.user.email,
+      });
       setAlert({
         visible: true,
         message: `${auth.user.email} Signed in successfully`,
@@ -178,6 +182,7 @@ const LogIn: React.FC = () => {
               value={user.password}
               onChange={handleUser}
               required
+              autoComplete=""
               className="mt-1 block w-full px-3 py-2 bg-white bg-opacity-50 border border-transparent rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white focus:border-white sm:text-sm"
               placeholder="Enter your password"
             />

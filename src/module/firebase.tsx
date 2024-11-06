@@ -17,7 +17,7 @@ import {
   User,
 } from "firebase/auth";
 import { getDatabase, ref, set, get, child } from "firebase/database";
-import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { getFirestore, collection, addDoc, getDocs } from "firebase/firestore";
 import { getStorage, ref as storageRef, uploadBytes } from "firebase/storage";
 
 // Firebase configuration
@@ -84,7 +84,10 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
   ) => {
     return signInWithEmailAndPassword(firebaseAuth, email, password);
   };
-
+  const listAllTask = () => {
+    // Create a reference under which you want to list
+    return getDocs(collection(firestore, "Task"));
+  };
   // Function to put data into Firebase database
   const putData = (key: string, data: any) => {
     set(ref(database, key), data);
@@ -115,27 +118,16 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
       return "";
     }
   };
-  const putDataFirestore = async (
-    name: string,
-    isbNumber: string,
-    price: number,
-    coverPic: any
-  ) => {
-    const imgRef = storageRef(
-      storage,
-      `publish/images/${Date.now()}-${coverPic}`
-    );
-    const uploadResult = await uploadBytes(imgRef, coverPic);
-    return await addDoc(collection(firestore, "books"), {
-      name,
-      isbNumber,
-      price,
-      coverPic: uploadResult.ref.fullPath,
-      userId: user?.uid,
-      userEmail: user?.email,
-      displayName: user?.displayName,
-      photoURL: user?.photoURL,
-    });
+  const putDataFirestore = async (Task: any) => {
+    try {
+      const data = await addDoc(collection(firestore, "Task"), {
+        Task,
+      });
+      return data;
+    } catch (error) {
+      console.error("Error adding document:", error);
+      return "";
+    }
   };
   // Check if user is logged in
   const isLoggedIn = user ? true : false;
@@ -148,6 +140,7 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
         signupUserWithEmailAndPassword,
         signinUserWithEmailAndPassword,
         signinUserWithGoogle,
+        listAllTask,
         putData,
         getData,
         getAdminData,

@@ -14,7 +14,6 @@ const NavBar = () => {
         { path: "/", label: "Home" },
         { path: "/about", label: "About" },
         { path: "/chat", label: "Chat" },
-        { path: "/publish", label: "Publish" },
       ]
     : [
         { path: "/", label: "Home" },
@@ -242,6 +241,7 @@ const NavBar = () => {
                           "https://via.placeholder.com/40"
                         }
                         alt="Profile"
+                        onClick={handleProfileClick}
                       />
                     </div>
                     <div className="ml-3">

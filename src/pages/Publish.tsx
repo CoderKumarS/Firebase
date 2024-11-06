@@ -4,11 +4,12 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useFirebase } from "../module/firebase";
 
-interface Book {
-  name: string;
-  isbNumber: string;
-  price: string;
-  coverPic: string;
+interface Task {
+  title: string;
+  status: string;
+  description: string;
+  assigne: string;
+  created: Date;
 }
 
 interface Alert {
@@ -19,18 +20,19 @@ interface Alert {
 
 const Publish: React.FC = () => {
   const firebase = useFirebase();
-  const [book, setBook] = useState<Book>({
-    name: "",
-    isbNumber: "",
-    price: "",
-    coverPic: "",
+  const [Task, setTask] = useState<Task>({
+    title: "",
+    status: "low", // Default to "low"
+    description: "",
+    assigne: "",
+    created: new Date(Date.now()),
   });
   const [alert, setAlert] = useState<Alert>({
     visible: false,
     message: "",
     color: "",
   });
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   useEffect(() => {
     if (alert.visible) {
       const timer = setTimeout(() => {
@@ -40,13 +42,18 @@ const Publish: React.FC = () => {
     }
   }, [alert.visible]);
 
-  const handleElement = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleElement = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { id, value } = e.target;
-    setBook((prev) => ({ ...prev, [id]: value }));
+    setTask((prev) => ({ ...prev, [id]: value }));
   };
 
-  const handleSubmit = async () => {
-    if (!book.isbNumber || !book.price || !book.name || !book.coverPic) {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    // Check if all required fields are filled
+    if (!Task.status || !Task.description || !Task.title || !Task.assigne) {
       setAlert({
         visible: true,
         message: "All fields are required",
@@ -56,24 +63,29 @@ const Publish: React.FC = () => {
     }
 
     try {
-      const element = await firebase.putDataFirestore(
-        book.name,
-        book.isbNumber,
-        book.price,
-        book.coverPic
-      );
-      setAlert({
-        visible: true,
-        message: `${element.book.name} added successfully`,
-        color: "green",
-      });
-      setBook({ name: "", isbNumber: "", price: "", coverPic: "" });
+      // Attempt to save the task to Firestore
+      const element = await firebase.putDataFirestore(Task);
+      console.log(element);
+
+      if (element) {
+        // On success, display success message
+        setAlert({
+          visible: true,
+          message: "Task added successfully!",
+          color: "green",
+        });
+        // Clear the form
+        setTask({ title: "", status: "low", description: "", assigne: "" });
+      }
     } catch (error: any) {
+      // On error, display error message
       setAlert({
         visible: true,
-        message: error.message,
+        message: `Error: ${error.message}`,
         color: "red",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -82,7 +94,7 @@ const Publish: React.FC = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="h-[calc(100dvh-4rem)]  bg-gradient-to-br from-blue-100 to-purple-100 flex flex-col items-center justify-center p-4"
+      className="h-[calc(100dvh-4rem)] bg-gradient-to-br from-blue-100 to-purple-100 flex flex-col items-center justify-center p-4"
     >
       <AnimatePresence>
         {alert.visible && (
@@ -90,7 +102,7 @@ const Publish: React.FC = () => {
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -50 }}
-            className={`fixed top-4 right-4 p-4 rounded-lg shadow-lg ${
+            className={`fixed top-20 right-4 p-4 rounded-lg shadow-lg ${
               alert.color === "red" ? "bg-red-500" : "bg-green-500"
             } text-white`}
           >
@@ -104,7 +116,7 @@ const Publish: React.FC = () => {
         initial={{ y: -20 }}
         animate={{ y: 0 }}
       >
-        Publish
+        Create Task
       </motion.h1>
 
       <motion.div
@@ -113,25 +125,19 @@ const Publish: React.FC = () => {
         animate={{ scale: 1 }}
         transition={{ type: "spring", stiffness: 260, damping: 20 }}
       >
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSubmit();
-          }}
-          className="space-y-4"
-        >
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label
-              htmlFor="name"
+              htmlFor="title"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Book Name
+              Task Title
             </label>
             <input
               type="text"
-              id="name"
-              placeholder="Enter the book name"
-              value={book.name}
+              id="title"
+              placeholder="Enter the Task Title"
+              value={Task.title}
               onChange={handleElement}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               required
@@ -140,16 +146,33 @@ const Publish: React.FC = () => {
 
           <div>
             <label
-              htmlFor="isbNumber"
+              htmlFor="description"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              ISBN
+              Description
+            </label>
+            <textarea
+              id="description"
+              placeholder="Enter the Task Description"
+              value={Task.description}
+              onChange={handleElement}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              required
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="assigne"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Assignee
             </label>
             <input
               type="text"
-              id="isbNumber"
-              placeholder="Enter ISBN number"
-              value={book.isbNumber}
+              id="assigne"
+              placeholder="Enter the Assignee Name"
+              value={Task.assigne}
               onChange={handleElement}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               required
@@ -158,45 +181,31 @@ const Publish: React.FC = () => {
 
           <div>
             <label
-              htmlFor="price"
+              htmlFor="status"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Price
+              Status
             </label>
-            <input
-              type="number"
-              id="price"
-              placeholder="Enter price"
-              value={book.price}
+            <select
+              id="status"
+              value={Task.status}
               onChange={handleElement}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="coverPic"
-              className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Cover Picture
-            </label>
-            <input
-              type="file"
-              id="coverPic"
-              onChange={handleElement}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-              required
-            />
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
           </div>
 
           <motion.button
             type="submit"
+            disabled={isSubmitting}
             className="w-full bg-blue-500 text-white font-semibold py-2 px-4 rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            Add
+            {isSubmitting ? "Uploading..." : "Add Task"}
           </motion.button>
         </form>
       </motion.div>

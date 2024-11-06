@@ -1,13 +1,11 @@
 import React, { useState } from "react";
 import { motion, useAnimation } from "framer-motion";
 import { useFirebase } from "../module/firebase";
-import { useNavigate } from "react-router-dom";
 import { set } from "firebase/database";
 
 export default function SignUp() {
   const firebase = useFirebase();
   const controls = useAnimation();
-  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [alert, setAlert] = useState<{
     type: "success" | "error";
@@ -57,18 +55,13 @@ export default function SignUp() {
   const signUpWithGoogle = async (): Promise<void> => {
     try {
       const auth = await firebase.signinUserWithGoogle();
-      console.log(auth.user.displayName);
-
       await firebase.putData("users/" + auth.user.uid, {
         name: auth.user.displayName,
         email: auth.user.email,
       });
       setAlert({
         type: "success",
-        message: `${auth.user.email} Signed in successfully`,
-      });
-      setTimeout(() => {
-        navigate("/profile");
+        message: `${auth.user.email} Signed in successfully.`,
       });
     } catch (error: any) {
       setAlert({ type: "error", message: error.message });

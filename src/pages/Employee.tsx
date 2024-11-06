@@ -7,7 +7,7 @@ interface Task {
   id: string;
   title: string;
   description: string;
-  createdDate: string;
+  created: string;
   priority: "low" | "medium" | "high";
   status: "accepted" | "completed" | "failed";
 }
@@ -24,33 +24,12 @@ interface Props {
 export default function EmployeeDashboard({ user }: Props) {
   const firebase = useFirebase();
   const navigate = useNavigate();
-
-  const [tasks, setTasks] = useState<Task[]>([
-    {
-      id: "1",
-      title: "Complete project proposal",
-      description: "Draft and submit the project proposal for the new client",
-      createdDate: "2023-05-15",
-      priority: "high",
-      status: "accepted",
-    },
-    {
-      id: "2",
-      title: "Review code changes",
-      description: "Review and approve the latest pull request",
-      createdDate: "2023-05-16",
-      priority: "medium",
-      status: "accepted",
-    },
-    {
-      id: "3",
-      title: "Prepare presentation",
-      description: "Create slides for the upcoming team meeting",
-      createdDate: "2023-05-17",
-      priority: "low",
-      status: "accepted",
-    },
-  ]);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  useEffect(() => {
+    firebase.listAllTask().then((data: any) => {
+      setTasks(data.docs);
+    });
+  }, []);
 
   const taskStats = {
     new: tasks.filter((t) => t.status === "accepted").length,
@@ -179,24 +158,27 @@ export default function EmployeeDashboard({ user }: Props) {
                     <div className="px-4 py-4 sm:px-6">
                       <div className="flex items-center justify-between">
                         <h3 className="text-lg leading-6 font-medium text-gray-900">
-                          {task.title}
+                          {task.data().Task.title}
                         </h3>
                         <span
                           className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            priorityColors[task.priority]
+                            priorityColors[task.data().Task.status]
                           }`}
                         >
-                          {task.priority}
+                          {task.data().Task.status}
                         </span>
                       </div>
                       <div className="mt-2 sm:flex sm:justify-between">
                         <div className="sm:flex">
                           <p className="flex items-center text-sm text-gray-500">
-                            {task.description}
+                            {task.data().Task.description}
                           </p>
                         </div>
                         <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                          <p>Created on {task.createdDate}</p>
+                          <p>
+                            Created on:
+                            {}
+                          </p>
                         </div>
                       </div>
                       <div className="mt-4 flex justify-end space-x-3">

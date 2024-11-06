@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Search, Users, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useFirebase } from "../module/firebase";
+import { NavLink } from "react-router-dom";
 
 interface User {
   uid: string;
@@ -10,7 +11,6 @@ interface User {
   email: string;
   profilePicture?: string;
 }
-
 interface Props {
   user: User;
 }
@@ -20,12 +20,10 @@ export default function AdminDashboard({ user }: Props) {
   const navigate = useNavigate();
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = useState(false);
   const [isTaskInfoModalOpen, setIsTaskInfoModalOpen] = useState(false);
   const [isEmployeeInfoModalOpen, setIsEmployeeInfoModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
-
   const stats = [
     { title: "Total Employees", value: 145, icon: Users },
     { title: "New Hires", value: 23, icon: Plus },
@@ -72,29 +70,7 @@ export default function AdminDashboard({ user }: Props) {
       status: "in-progress",
       description: "Develop the new user authentication system",
     },
-    {
-      id: 2,
-      title: "Fix critical bug",
-      assignee: "Bob Anderson",
-      status: "completed",
-      description: "Resolve the issue with data synchronization",
-    },
-    {
-      id: 3,
-      title: "Prepare project proposal",
-      assignee: "Carol Taylor",
-      status: "failed",
-      description: "Create a detailed proposal for the upcoming client project",
-    },
-    {
-      id: 4,
-      title: "Update documentation",
-      assignee: "John Doe",
-      status: "in-progress",
-      description: "Review and update the API documentation",
-    },
   ];
-
   const employees = [
     {
       id: 1,
@@ -129,13 +105,6 @@ export default function AdminDashboard({ user }: Props) {
       joinDate: "2022-05-01",
     },
   ];
-
-  const handleCreateTask = (e: any) => {
-    e.preventDefault();
-    // Implement task creation logic here
-    setIsCreateTaskModalOpen(false);
-  };
-
   const handleTaskClick = (task: any) => {
     setSelectedTask(task);
     setIsTaskInfoModalOpen(true);
@@ -154,7 +123,8 @@ export default function AdminDashboard({ user }: Props) {
       <header>
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
           <h1 className="text-3xl font-bold text-gray-900 ">
-            Employee Dashboard
+            Admin Dashboard
+            <p className="text-gray-500 text-lg">{user.name}</p>
           </h1>
           <button
             onClick={handleSignOut}
@@ -180,12 +150,12 @@ export default function AdminDashboard({ user }: Props) {
                   className="pl-10 pr-4 py-2 border border-gray-300  rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white  text-gray-900 "
                 />
               </div>
-              <button
-                onClick={() => setIsCreateTaskModalOpen(true)}
+              <NavLink
+                to="/publish"
                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 Create Task
-              </button>
+              </NavLink>
             </div>
           </div>
 
@@ -397,92 +367,6 @@ export default function AdminDashboard({ user }: Props) {
       </main>
 
       <AnimatePresence>
-        {isCreateTaskModalOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
-          >
-            <motion.div
-              initial={{ scale: 0.95 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.95 }}
-              className="bg-white  rounded-lg p-6 w-full max-w-md"
-            >
-              <h2 className="text-2xl font-bold mb-4 text-gray-900 ">
-                Create New Task
-              </h2>
-              <form onSubmit={handleCreateTask}>
-                <div className="space-y-4">
-                  <div>
-                    <label
-                      htmlFor="task-title"
-                      className="block text-sm font-medium text-gray-800 "
-                    >
-                      Task Title
-                    </label>
-                    <input
-                      type="text"
-                      id="task-title"
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50   "
-                      placeholder="Enter task title"
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="task-description"
-                      className="block text-sm font-medium text-gray-800 "
-                    >
-                      Description
-                    </label>
-                    <textarea
-                      id="task-description"
-                      rows={3}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50   "
-                      placeholder="Enter task description"
-                    ></textarea>
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="task-assignee"
-                      className="block text-sm font-medium text-gray-800 "
-                    >
-                      Assignee
-                    </label>
-                    <select
-                      id="task-assignee"
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50   "
-                    >
-                      <option value="">Select assignee</option>
-                      {employees.map((employee) => (
-                        <option key={employee.id} value={employee.id}>
-                          {employee.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="flex justify-end space-x-2">
-                    <button
-                      type="button"
-                      onClick={() => setIsCreateTaskModalOpen(false)}
-                      className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-800 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500   "
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                    >
-                      Create Task
-                    </button>
-                  </div>
-                </div>
-              </form>
-            </motion.div>
-          </motion.div>
-        )}
-
         {isTaskInfoModalOpen && selectedTask && (
           <motion.div
             initial={{ opacity: 0 }}
