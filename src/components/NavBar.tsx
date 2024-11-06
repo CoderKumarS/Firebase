@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useFirebase } from "../module/firebase";
@@ -22,7 +20,6 @@ const NavBar = () => {
         { path: "/", label: "Home" },
         { path: "/about", label: "About" },
         { path: "/contact", label: "Contact" },
-        { path: "/gallery", label: "Gallery" },
       ];
 
   const handleSearch = (e: React.FormEvent) => {

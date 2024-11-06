@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState, useEffect } from "react";
 import { useFirebase } from "../module/firebase";
 import { useNavigate, NavLink } from "react-router-dom";
@@ -20,6 +18,7 @@ const LogIn: React.FC = () => {
   const firebase = useFirebase();
   const navigate = useNavigate();
   const controls = useAnimation();
+  const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState<UserState>({
     email: "",
     password: "",
@@ -50,8 +49,26 @@ const LogIn: React.FC = () => {
       navigate("/profile");
     }
   }, [firebase, navigate]);
-
+  const signUpWithGoogle = async (): Promise<void> => {
+    setIsLoading(true);
+    try {
+      const auth = await firebase.signinUserWithGoogle();
+      setAlert({
+        visible: true,
+        message: `${auth.user.email} Signed in successfully`,
+        color: "green",
+      });
+    } catch (error: any) {
+      setAlert({
+        visible: true,
+        message: error.message,
+        color: "red",
+      });
+      setIsLoading(false);
+    }
+  };
   const handleLogIn = async (): Promise<void> => {
+    setIsLoading(true);
     if (user.email === "" || user.password === "") {
       setAlert({
         visible: true,
@@ -80,6 +97,7 @@ const LogIn: React.FC = () => {
         color: "red",
       });
     }
+    setIsLoading(false);
   };
 
   return (
@@ -176,7 +194,7 @@ const LogIn: React.FC = () => {
               type="button"
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
-              Log In
+              {isLoading ? "Logging In..." : "Log In"}
             </motion.button>
           </motion.div>
         </form>
@@ -202,6 +220,7 @@ const LogIn: React.FC = () => {
               whileTap={{ scale: 0.95 }}
               type="button"
               className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+              onClick={signUpWithGoogle}
             >
               <span className="sr-only">Sign in with Google</span>
               <svg

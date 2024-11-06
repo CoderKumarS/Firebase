@@ -11,6 +11,12 @@ import NavBar from "./components/NavBar";
 import Publish from "./pages/Publish";
 import Profile from "./pages/Profile";
 import "./App.css";
+import AboutPage from "./pages/About";
+import ProfileEditPage from "./pages/Edit";
+import PerformanceReview from "./pages/Performance";
+import TimeTracking from "./pages/TimeTracking";
+import TaskManagement from "./pages/TaskMangement";
+import Component from "./pages/Check";
 
 const items = [
   "New York",
@@ -33,17 +39,16 @@ function App() {
     const cursorTail = cursorTailRef.current;
     let tailPoints: { x: number; y: number }[] = [];
     const maxTailLength = 20;
-    let animationFrameId: number;
 
-    const updateCursorPosition = (e: MouseEvent) => {
+    const updateCursorPosition = (x: number, y: number) => {
       if (cursorCircle && cursorTail) {
         gsap.to(cursorCircle, {
-          x: e.clientX + 80,
-          y: e.clientY + 80,
+          x: x + 80,
+          y: y + 80,
           duration: 0.3,
         });
 
-        tailPoints.push({ x: e.clientX, y: e.clientY });
+        tailPoints.push({ x, y });
         if (tailPoints.length > maxTailLength) {
           tailPoints.shift();
         }
@@ -53,6 +58,10 @@ function App() {
           .join(" L ")}`;
         gsap.set(cursorTail, { attr: { d: path } });
       }
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      updateCursorPosition(e.clientX, e.clientY);
     };
 
     const handleMouseEnter = () => {
@@ -70,26 +79,15 @@ function App() {
         gsap.to(cursorTail, { opacity: 0, duration: 0.3 });
       }
     };
-    document.addEventListener("mousemove", updateCursorPosition);
+
+    document.addEventListener("mousemove", handleMouseMove);
     document.addEventListener("mouseenter", handleMouseEnter);
     document.addEventListener("mouseleave", handleMouseLeave);
 
-    let lastKnownMousePosition = { clientX: 0, clientY: 0 };
-    document.addEventListener("mousemove", (e) => {
-      lastKnownMousePosition = e;
-    });
-
-    const animate = () => {
-      updateCursorPosition(lastKnownMousePosition);
-      animationFrameId = requestAnimationFrame(animate);
-    };
-    animate();
-
     return () => {
-      document.removeEventListener("mousemove", updateCursorPosition);
+      document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseenter", handleMouseEnter);
       document.removeEventListener("mouseleave", handleMouseLeave);
-      cancelAnimationFrame(animationFrameId);
     };
   }, []);
 
@@ -104,6 +102,12 @@ function App() {
         <Route path="/chat" element={<Chat />} />
         <Route path="/publish" element={<Publish />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/editProfile" element={<ProfileEditPage />} />
+        <Route path="/check" element={<Component />} />
+        {/* <Route path="/tasks" element={<TaskManagement />} /> */}
+        {/* <Route path="/time-tracking" element={<TimeTracking />} /> */}
+        {/* <Route path="/performance-review" element={<PerformanceReview />} /> */}
         <Route
           path="/list"
           element={<ListGroup items={items} heading={heading} />}
@@ -112,7 +116,7 @@ function App() {
       <div
         ref={cursorCircleRef}
         id="cursorCircle"
-        className="fixed w-12 h-12 rounded-full pointer-events-none"
+        className="fixed w-6 h-6 rounded-full pointer-events-none sparkle-ball"
       ></div>
       <svg
         id="svgCursor"
@@ -124,12 +128,21 @@ function App() {
             <stop offset="50%" stopColor="#8b5cf6" />
             <stop offset="100%" stopColor="#ec4899" />
           </linearGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3.5" result="coloredBlur" />
+            <feMerge>
+              <feMergeNode in="coloredBlur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
         </defs>
         <path
           ref={cursorTailRef}
           stroke="url(#tailGradient)"
           strokeWidth="2"
           fill="none"
+          filter="url(#glow)"
+          className="sparkle-tail"
         />
       </svg>
     </div>

@@ -8,9 +8,11 @@ import {
 import { initializeApp } from "firebase/app";
 import {
   getAuth,
+  GoogleAuthProvider,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   onAuthStateChanged,
+  signInWithPopup,
   signOut,
   User,
 } from "firebase/auth";
@@ -20,13 +22,13 @@ import { getStorage, ref as storageRef, uploadBytes } from "firebase/storage";
 
 // Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyCsKcyebUwlLJtgRFdr57HgOjJUSNMmk4k",
-  authDomain: "loginfirebase-95ef0.firebaseapp.com",
-  projectId: "loginfirebase-95ef0",
-  storageBucket: "loginfirebase-95ef0.appspot.com",
-  messagingSenderId: "383204528230",
-  appId: "1:383204528230:web:4c398f73fbd5984c469da7",
-  databaseURL: "https://loginfirebase-95ef0-default-rtdb.firebaseio.com",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
 };
 
 // Initialize Firebase
@@ -35,6 +37,7 @@ const firebaseAuth = getAuth(firebaseApp);
 const database = getDatabase(firebaseApp);
 const firestore = getFirestore(firebaseApp);
 const storage = getStorage(firebaseApp);
+const googleProvider = new GoogleAuthProvider();
 
 // createContext with any as initial type
 const FirebaseContext = createContext<any>(null);
@@ -70,6 +73,10 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
     return createUserWithEmailAndPassword(firebaseAuth, email, password);
   };
 
+  // Function to sign in a user with google
+  const signinUserWithGoogle = async () => {
+    return signInWithPopup(firebaseAuth, googleProvider);
+  };
   // Function to sign in a user with email and password
   const signinUserWithEmailAndPassword = async (
     email: string,
@@ -84,7 +91,20 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
   };
   const getData = async (key: string) => {
     try {
-      const snapshot = await get(child(ref(database), "users/" + key));
+      let snapshot = await get(child(ref(database), "users/" + key));
+      if (snapshot.exists()) {
+        return snapshot.val();
+      } else {
+        return "";
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      return "";
+    }
+  };
+  const getAdminData = async (key: string) => {
+    try {
+      const snapshot = await get(child(ref(database), "admin/" + key));
       if (snapshot.exists()) {
         return snapshot.val();
       } else {
@@ -127,8 +147,10 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
       value={{
         signupUserWithEmailAndPassword,
         signinUserWithEmailAndPassword,
+        signinUserWithGoogle,
         putData,
         getData,
+        getAdminData,
         putDataFirestore,
         isLoggedIn,
         signOutUser,

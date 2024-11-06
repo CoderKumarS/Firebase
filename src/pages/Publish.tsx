@@ -1,43 +1,60 @@
-import React, { useState } from "react";
-import { Form } from "react-bootstrap";
-import { useFirebase } from "../module/firebase";
-import Alert from "../components/Alert";
-import Button from "../components/Button";
+"use client";
 
-function Publish() {
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useFirebase } from "../module/firebase";
+
+interface Book {
+  name: string;
+  isbNumber: string;
+  price: string;
+  coverPic: string;
+}
+
+interface Alert {
+  visible: boolean;
+  message: string;
+  color: string;
+}
+
+const Publish: React.FC = () => {
   const firebase = useFirebase();
-  const [book, setBook] = useState({
+  const [book, setBook] = useState<Book>({
     name: "",
     isbNumber: "",
     price: "",
     coverPic: "",
   });
-  const [alert, setAlert] = useState({
+  const [alert, setAlert] = useState<Alert>({
     visible: false,
     message: "",
     color: "",
   });
-  let target, value;
+
+  useEffect(() => {
+    if (alert.visible) {
+      const timer = setTimeout(() => {
+        setAlert((prev) => ({ ...prev, visible: false }));
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [alert.visible]);
+
   const handleElement = (e: React.ChangeEvent<HTMLInputElement>) => {
-    target = e.target.id;
-    value = e.target.value;
-    setBook({ ...book, [target]: value });
+    const { id, value } = e.target;
+    setBook((prev) => ({ ...prev, [id]: value }));
   };
-  if (alert.visible) {
-    setTimeout(() => {
-      setAlert({ ...alert, visible: false });
-    }, 5000);
-  }
+
   const handleSubmit = async () => {
     if (!book.isbNumber || !book.price || !book.name || !book.coverPic) {
       setAlert({
-        ...alert,
         visible: true,
         message: "All fields are required",
-        color: "danger",
+        color: "red",
       });
       return;
     }
+
     try {
       const element = await firebase.putDataFirestore(
         book.name,
@@ -46,87 +63,145 @@ function Publish() {
         book.coverPic
       );
       setAlert({
-        ...alert,
         visible: true,
-        message: element.book.name + " added successfully",
-        color: "success",
+        message: `${element.book.name} added successfully`,
+        color: "green",
       });
       setBook({ name: "", isbNumber: "", price: "", coverPic: "" });
     } catch (error: any) {
       setAlert({
-        ...alert,
         visible: true,
         message: error.message,
-        color: "danger",
+        color: "red",
       });
     }
   };
 
   return (
-    <div className="d-flex flex-column align-items-center justify-content-center postion-relative">
-      {alert.visible && (
-        <Alert
-          onClose={() => setAlert({ ...alert, visible: false })}
-          color={alert.color}
-        >
-          {alert.message}
-        </Alert>
-      )}
-      <h1 className="m-3 pb-2 text-center border-bottom border-primary">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="h-[calc(100dvh-4rem)]  bg-gradient-to-br from-blue-100 to-purple-100 flex flex-col items-center justify-center p-4"
+    >
+      <AnimatePresence>
+        {alert.visible && (
+          <motion.div
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -50 }}
+            className={`fixed top-4 right-4 p-4 rounded-lg shadow-lg ${
+              alert.color === "red" ? "bg-red-500" : "bg-green-500"
+            } text-white`}
+          >
+            {alert.message}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <motion.h1
+        className="text-4xl font-bold mb-8 text-gray-800 border-b-2 border-blue-500 pb-2"
+        initial={{ y: -20 }}
+        animate={{ y: 0 }}
+      >
         Publish
-      </h1>
-      <Form className="m-3 p-2 border border-primary rounded bg-info bg-opacity-10 container-sm">
-        <Form.Group controlId="name">
-          <Form.Label>Book Name</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Enter the book name"
-            value={book.name}
-            onChange={handleElement}
-            required
-          />
-        </Form.Group>
+      </motion.h1>
 
-        <Form.Group controlId="isbNumber">
-          <Form.Label>ISBN</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Enter ISBN number"
-            value={book.isbNumber}
-            onChange={handleElement}
-            required
-          />
-        </Form.Group>
+      <motion.div
+        className="w-full max-w-md bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg rounded-xl p-6 shadow-xl"
+        initial={{ scale: 0.9 }}
+        animate={{ scale: 1 }}
+        transition={{ type: "spring", stiffness: 260, damping: 20 }}
+      >
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSubmit();
+          }}
+          className="space-y-4"
+        >
+          <div>
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Book Name
+            </label>
+            <input
+              type="text"
+              id="name"
+              placeholder="Enter the book name"
+              value={book.name}
+              onChange={handleElement}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              required
+            />
+          </div>
 
-        <Form.Group controlId="price">
-          <Form.Label>Price</Form.Label>
-          <Form.Control
-            type="number"
-            placeholder="Enter price"
-            value={book.price}
-            onChange={handleElement}
-            required
-          />
-        </Form.Group>
-        <Form.Group controlId="coverPic">
-          <Form.Label>Cover Picture</Form.Label>
-          <Form.Control
-            type="file"
-            placeholder="Enter cover picture"
-            value={book.coverPic}
-            onChange={handleElement}
-            required
-          />
-        </Form.Group>
+          <div>
+            <label
+              htmlFor="isbNumber"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              ISBN
+            </label>
+            <input
+              type="text"
+              id="isbNumber"
+              placeholder="Enter ISBN number"
+              value={book.isbNumber}
+              onChange={handleElement}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              required
+            />
+          </div>
 
-        <div className="my-2 text-center">
-          <Button onClick={handleSubmit} color="primary">
+          <div>
+            <label
+              htmlFor="price"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Price
+            </label>
+            <input
+              type="number"
+              id="price"
+              placeholder="Enter price"
+              value={book.price}
+              onChange={handleElement}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              required
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="coverPic"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Cover Picture
+            </label>
+            <input
+              type="file"
+              id="coverPic"
+              onChange={handleElement}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              required
+            />
+          </div>
+
+          <motion.button
+            type="submit"
+            className="w-full bg-blue-500 text-white font-semibold py-2 px-4 rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
             Add
-          </Button>
-        </div>
-      </Form>
-    </div>
+          </motion.button>
+        </form>
+      </motion.div>
+    </motion.div>
   );
-}
+};
 
 export default Publish;

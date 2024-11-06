@@ -26,3 +26,47 @@
 #svgCursor {
     z-index: 9997;
 }
+
+.sparkle-ball {
+    background: radial-gradient(circle,
+            #ffffff 0%,
+            #3b82f6 50%,
+            #8b5cf6 100%);
+    box-shadow: 0 0 10px #ffffff, 0 0 20px #3b82f6, 0 0 30px #8b5cf6;
+    animation: pulse 2s infinite;
+}
+
+.sparkle-tail {
+    animation: sparkle 1.5s linear infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 10px #ffffff, 0 0 20px #3b82f6, 0 0 30px #8b5cf6;
+    }
+
+    50% {
+        box-shadow: 0 0 20px #ffffff, 0 0 30px #3b82f6, 0 0 40px #8b5cf6;
+    }
+
+    100% {
+        box-shadow: 0 0 10px #ffffff, 0 0 20px #3b82f6, 0 0 30px #8b5cf6;
+    }
+}
+
+@keyframes sparkle {
+    0% {
+        stroke-dasharray: 0 50;
+        stroke-width: 2;
+    }
+
+    50% {
+        stroke-dasharray: 25 50;
+        stroke-width: 3;
+    }
+
+    100% {
+        stroke-dasharray: 50 50;
+        stroke-width: 2;
+    }
+}
