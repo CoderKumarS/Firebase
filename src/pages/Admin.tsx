@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Search, Users, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -14,7 +14,15 @@ interface User {
 interface Props {
   user: User;
 }
-
+interface Task {
+  id: string;
+  title: string;
+  description: string;
+  created: string;
+  assigne: string;
+  priority: "low" | "medium" | "high";
+  status: "accepted" | "completed" | "failed";
+}
 export default function AdminDashboard({ user }: Props) {
   const firebase = useFirebase();
   const navigate = useNavigate();
@@ -62,15 +70,12 @@ export default function AdminDashboard({ user }: Props) {
     { id: 3, name: "Carol Taylor", position: "UX Designer", performance: 90 },
   ];
 
-  const tasks = [
-    {
-      id: 1,
-      title: "Implement new feature",
-      assignee: "Alice Williams",
-      status: "in-progress",
-      description: "Develop the new user authentication system",
-    },
-  ];
+  const [tasks, setTasks] = useState<Task[]>([]);
+  useEffect(() => {
+    firebase.listAllTask().then((data: any) => {
+      setTasks(data.docs);
+    });
+  }, []);
   const employees = [
     {
       id: 1,
@@ -106,7 +111,7 @@ export default function AdminDashboard({ user }: Props) {
     },
   ];
   const handleTaskClick = (task: any) => {
-    setSelectedTask(task);
+    setSelectedTask(task.data().Task);
     setIsTaskInfoModalOpen(true);
   };
 
@@ -336,25 +341,25 @@ export default function AdminDashboard({ user }: Props) {
                     >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900 ">
-                          {task.title}
+                          {task.data().Task.title}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-600 ">
-                          {task.assignee}
+                          {task.data().Task.assigne}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span
                           className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            task.status === "completed"
+                            task.data().Task.status === "completed"
                               ? "bg-green-100 text-green-800"
-                              : task.status === "in-progress"
+                              : task.data().Task.status === "in-progress"
                               ? "bg-yellow-100 text-yellow-800"
                               : "bg-red-100 text-red-800"
                           }`}
                         >
-                          {task.status}
+                          {task.data().Task.status}
                         </span>
                       </td>
                     </tr>
@@ -411,7 +416,7 @@ export default function AdminDashboard({ user }: Props) {
                     Assignee
                   </h3>
                   <p className="mt-1 text-sm text-gray-900 ">
-                    {selectedTask.assignee}
+                    {selectedTask.assigne}
                   </p>
                 </div>
                 <div>

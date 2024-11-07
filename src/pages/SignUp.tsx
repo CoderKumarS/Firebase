@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion, useAnimation } from "framer-motion";
 import { useFirebase } from "../module/firebase";
 import { set } from "firebase/database";
+import { useNavigate } from "react-router-dom";
 
 export default function SignUp() {
   const firebase = useFirebase();
+  const navigate = useNavigate();
   const controls = useAnimation();
   const [isLoading, setIsLoading] = useState(false);
   const [alert, setAlert] = useState<{
@@ -17,7 +19,11 @@ export default function SignUp() {
     password: "",
   });
   const [errors, setErrors] = useState({ name: "", email: "", password: "" });
-
+  useEffect(() => {
+    if (firebase.isLoggedIn) {
+      navigate("/profile");
+    }
+  }, [firebase, navigate]);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -59,6 +65,11 @@ export default function SignUp() {
         name: auth.user.displayName,
         email: auth.user.email,
       });
+      await firebase.putUserDataFirestore({
+        id: auth.user.uid,
+        name: formData.name,
+        email: formData.email,
+      });
       setAlert({
         type: "success",
         message: `${auth.user.email} Signed in successfully.`,
@@ -78,6 +89,11 @@ export default function SignUp() {
         formData.password
       );
       await firebase.putData("users/" + auth.user.uid, {
+        name: formData.name,
+        email: formData.email,
+      });
+      await firebase.putUserDataFirestore({
+        id: auth.user.uid,
         name: formData.name,
         email: formData.email,
       });

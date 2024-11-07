@@ -1,8 +1,7 @@
-"use client";
-
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-
+import { useParams } from "react-router-dom";
+import { useFirebase } from "../module/firebase";
 interface EmployeeProfile {
   name: string;
   email: string;
@@ -12,6 +11,13 @@ interface EmployeeProfile {
 }
 
 const ProfileEditPage: React.FC = () => {
+  const { id } = useParams();
+  const firebase = useFirebase();
+  useEffect(() => {
+    firebase.getDataById(id).then((value: any) => {
+      console.log(value.data());
+    });
+  }, []);
   const [profile, setProfile] = useState<EmployeeProfile>({
     name: "John Doe",
     email: "john.doe@example.com",

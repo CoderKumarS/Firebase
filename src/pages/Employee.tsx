@@ -4,6 +4,7 @@ import { useFirebase } from "../module/firebase";
 import { useNavigate, NavLink } from "react-router-dom";
 
 interface Task {
+  [x: string]: any;
   id: string;
   title: string;
   description: string;
@@ -43,6 +44,7 @@ export default function EmployeeDashboard({ user }: Props) {
   };
 
   const handleTaskAction = (taskId: string, action: "complete" | "fail") => {
+    console.log(taskId);
     setTasks(
       tasks.map((task) =>
         task.id === taskId
@@ -52,7 +54,7 @@ export default function EmployeeDashboard({ user }: Props) {
     );
   };
 
-  const priorityColors = {
+  const priorityColors: any = {
     low: "bg-green-100 text-green-800",
     medium: "bg-yellow-100 text-yellow-800",
     high: "bg-red-100 text-red-800",
@@ -70,8 +72,8 @@ export default function EmployeeDashboard({ user }: Props) {
                 <h1 className="text-lg font-medium text-gray-600">
                   {user.name}
                 </h1>
-                <NavLink
-                  to="/editProfile"
+                <button
+                  onClick={(e) => navigate(`/editProfile/${user.uid}`)}
                   className="ml-2 text-gray-500 hover:text-gray-700 focus:outline-none"
                 >
                   <svg
@@ -82,7 +84,7 @@ export default function EmployeeDashboard({ user }: Props) {
                   >
                     <path d="M17.414 2.586a2 2 0 00-2.828 0L3 14.172V17h2.828l11.586-11.586a2 2 0 000-2.828zM5 15v-1.586l9.586-9.586 1.586 1.586L6.586 15H5z" />
                   </svg>
-                </NavLink>
+                </button>
               </div>
             </div>
             <div className="flex items-center">

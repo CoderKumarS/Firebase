@@ -103,7 +103,7 @@ function App() {
         <Route path="/publish" element={<Publish />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/about" element={<AboutPage />} />
-        <Route path="/editProfile" element={<ProfileEditPage />} />
+        <Route path="/editProfile/:id" element={<ProfileEditPage />} />
         <Route path="/check" element={<Component />} />
         {/* <Route path="/tasks" element={<TaskManagement />} /> */}
         {/* <Route path="/time-tracking" element={<TimeTracking />} /> */}

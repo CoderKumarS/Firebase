@@ -17,7 +17,14 @@ import {
   User,
 } from "firebase/auth";
 import { getDatabase, ref, set, get, child } from "firebase/database";
-import { getFirestore, collection, addDoc, getDocs } from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  doc,
+  getDoc,
+} from "firebase/firestore";
 import { getStorage, ref as storageRef, uploadBytes } from "firebase/storage";
 
 // Firebase configuration
@@ -92,6 +99,21 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
   const putData = (key: string, data: any) => {
     set(ref(database, key), data);
   };
+  const putUserDataFirestore = async (id: any) => {
+    try {
+      const data = await addDoc(collection(firestore, "User"), {
+        id: id.id,
+        name: id.name,
+        email: id.email,
+      });
+      console.log(data);
+
+      return data;
+    } catch (error) {
+      console.error("Error adding document:", error);
+      return "";
+    }
+  };
   const getData = async (key: string) => {
     try {
       let snapshot = await get(child(ref(database), "users/" + key));
@@ -104,6 +126,13 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
       console.error("Error fetching data:", error);
       return "";
     }
+  };
+  const getDataById = async (id: string) => {
+    const docRef = doc(firestore, "User", id);
+    const result = await getDoc(docRef);
+    console.log(result.data());
+
+    return result;
   };
   const getAdminData = async (key: string) => {
     try {
@@ -142,7 +171,9 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
         signinUserWithGoogle,
         listAllTask,
         putData,
+        putUserDataFirestore,
         getData,
+        getDataById,
         getAdminData,
         putDataFirestore,
         isLoggedIn,
