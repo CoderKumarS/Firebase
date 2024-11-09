@@ -24,6 +24,10 @@ import {
   getDocs,
   doc,
   getDoc,
+  query,
+  where,
+  setDoc,
+  updateDoc,
 } from "firebase/firestore";
 import { getStorage, ref as storageRef, uploadBytes } from "firebase/storage";
 
@@ -106,8 +110,6 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
         name: id.name,
         email: id.email,
       });
-      console.log(data);
-
       return data;
     } catch (error) {
       console.error("Error adding document:", error);
@@ -128,11 +130,43 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
   const getDataById = async (id: string) => {
-    const docRef = doc(firestore, "User", id);
-    const result = await getDoc(docRef);
-    console.log(result.data());
-
-    return result;
+    try {
+      const userQuery = query(
+        collection(firestore, "User"),
+        where("id", "==", id)
+      );
+      const querySnapshot = await getDocs(userQuery);
+      if (!querySnapshot.empty) {
+        const userData = querySnapshot.docs[0].data();
+        return userData;
+      } else {
+        console.log("No user found with that ID");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      return null;
+    }
+  };
+  const updateUserDataFirestore = async (id: string, updatedData: any) => {
+    try {
+      const userQuery = query(
+        collection(firestore, "User"),
+        where("id", "==", id)
+      );
+      const querySnapshot = await getDocs(userQuery);
+      if (!querySnapshot.empty) {
+        const userData = querySnapshot.docs[0].ref;
+        await updateDoc(userData, updatedData);
+        return true; // Indicate success
+      } else {
+        console.log("No user found with that ID");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error updating user data:", error);
+      return false;
+    }
   };
   const getAdminData = async (key: string) => {
     try {
@@ -172,6 +206,7 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
         listAllTask,
         putData,
         putUserDataFirestore,
+        updateUserDataFirestore,
         getData,
         getDataById,
         getAdminData,

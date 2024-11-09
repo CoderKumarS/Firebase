@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useFirebase } from "../module/firebase";
+
 interface EmployeeProfile {
+  id: string;
   name: string;
   email: string;
   position: string;
@@ -11,21 +13,43 @@ interface EmployeeProfile {
 }
 
 const ProfileEditPage: React.FC = () => {
-  const { id } = useParams();
+  const { id } = useParams(); // Get the id from the URL
   const firebase = useFirebase();
-  useEffect(() => {
-    firebase.getDataById(id).then((value: any) => {
-      console.log(value.data());
-    });
-  }, []);
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const [alert, setAlert] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
+
   const [profile, setProfile] = useState<EmployeeProfile>({
-    name: "John Doe",
-    email: "john.doe@example.com",
-    position: "Software Engineer",
-    department: "Engineering",
-    bio: "Passionate about creating efficient and scalable software solutions.",
+    id: "",
+    name: "",
+    email: "",
+    position: "",
+    department: "",
+    bio: "",
   });
 
+  // Fetch the user data from Firestore when the component mounts
+  useEffect(() => {
+    if (id) {
+      firebase.getDataById(id).then((data: any) => {
+        if (data) {
+          setProfile({
+            id: data.id,
+            name: data.name,
+            email: data.email,
+            position: data.position || "", // Default empty if not set
+            department: data.department || "", // Default empty if not set
+            bio: data.bio || "", // Default empty if not set
+          });
+        }
+      });
+    }
+  }, [id, firebase]);
+
+  // Handle form input changes
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -36,11 +60,38 @@ const ProfileEditPage: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Handle form submission (update the profile)
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically send the updated profile to your backend
-    console.log("Updated profile:", profile);
-    // Show a success message or redirect
+    setIsLoading(false);
+    try {
+      // Update the user data in Firestore
+      const updated = await firebase.updateUserDataFirestore(profile.id, {
+        name: profile.name,
+        email: profile.email,
+        position: profile.position,
+        department: profile.department,
+        bio: profile.bio,
+      });
+      if (updated) {
+        setAlert({
+          type: "success",
+          message: "Data Updated successfully.",
+        });
+        setTimeout(() => {
+          navigate("/profile");
+        }, 2000);
+      } else {
+        setAlert({
+          type: "error",
+          message: "An error occurred. Please try again later.",
+        });
+      }
+    } catch (error: any) {
+      setAlert({ type: "error", message: error.message });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -54,7 +105,23 @@ const ProfileEditPage: React.FC = () => {
         <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">
           Edit Your Profile
         </h1>
+        {alert && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+            className={`mt-4 p-3 rounded-md ${
+              alert.type === "success"
+                ? "bg-green-100 text-green-800"
+                : "bg-red-100 text-red-800"
+            }`}
+          >
+            <p className="text-sm">{alert.message}</p>
+          </motion.div>
+        )}
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Name Field */}
           <motion.div
             className="neumorphism-input"
             whileHover={{ scale: 1.02 }}
@@ -77,6 +144,7 @@ const ProfileEditPage: React.FC = () => {
             />
           </motion.div>
 
+          {/* Email Field */}
           <motion.div
             className="neumorphism-input"
             whileHover={{ scale: 1.02 }}
@@ -99,6 +167,7 @@ const ProfileEditPage: React.FC = () => {
             />
           </motion.div>
 
+          {/* Position Field */}
           <motion.div
             className="neumorphism-input"
             whileHover={{ scale: 1.02 }}
@@ -121,6 +190,7 @@ const ProfileEditPage: React.FC = () => {
             />
           </motion.div>
 
+          {/* Department Field */}
           <motion.div
             className="neumorphism-input"
             whileHover={{ scale: 1.02 }}
@@ -143,6 +213,7 @@ const ProfileEditPage: React.FC = () => {
             />
           </motion.div>
 
+          {/* Bio Field */}
           <motion.div
             className="neumorphism-input"
             whileHover={{ scale: 1.02 }}
@@ -165,13 +236,15 @@ const ProfileEditPage: React.FC = () => {
             ></textarea>
           </motion.div>
 
+          {/* Submit Button */}
           <motion.button
             type="submit"
+            disabled={isLoading}
             className="w-full bg-blue-500 text-white font-bold py-3 px-4 rounded-full shadow-lg hover:bg-blue-600 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            Save Changes
+            {isLoading ? "Updataing Data..." : "Save Changes"}
           </motion.button>
         </form>
       </motion.div>

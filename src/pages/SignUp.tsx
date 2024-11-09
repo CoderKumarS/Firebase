@@ -106,6 +106,7 @@ export default function SignUp() {
     } finally {
       setIsLoading(false);
       setFormData({ name: "", email: "", password: "" });
+      navigate("/profile");
     }
   };
 

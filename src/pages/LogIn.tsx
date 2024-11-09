@@ -89,7 +89,6 @@ const LogIn: React.FC = () => {
       );
       setAlert({
         visible: true,
-
         message: `${auth.user.email} Signed in successfully`,
         color: "green",
       });
@@ -109,7 +108,7 @@ const LogIn: React.FC = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="h-[calc(100dvh-4rem)] flex items-center justify-center bg-cover bg-center"
+      className="h-[calc(100dvh-4rem)] flex items-center justify-center bg-cover bg-center bg-slate-700"
       style={{
         backgroundImage:
           "url('https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_v38iuAxhM7IUI-KbsEeiNmLgUyiw3_SfW3CI6x9OY4cTjUv8MX_LivgjkUHM60GLzq_UboTuKaT0YoWyop0Kff-JBsbMEXfsyyBPPe7K0wXtG7Q9YTNOzmi3PV99DxPO4oyQSHQwA=w919-h516-p-k-no-nu')",
