@@ -30,7 +30,7 @@ export default function AdminDashboard({ user }: Props) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isTaskInfoModalOpen, setIsTaskInfoModalOpen] = useState(false);
   const [isEmployeeInfoModalOpen, setIsEmployeeInfoModalOpen] = useState(false);
-  const [selectedTask, setSelectedTask] = useState(null);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const stats = [
     { title: "Total Employees", value: 145, icon: Users },
@@ -111,7 +111,7 @@ export default function AdminDashboard({ user }: Props) {
     },
   ];
   const handleTaskClick = (task: any) => {
-    setSelectedTask(task.data().Task);
+    setSelectedTask(task.data());
     setIsTaskInfoModalOpen(true);
   };
 
@@ -333,37 +333,40 @@ export default function AdminDashboard({ user }: Props) {
                   </tr>
                 </thead>
                 <tbody className="bg-white  divide-y divide-gray-200 ">
-                  {tasks.map((task) => (
-                    <tr
-                      key={task.id}
-                      className="hover:bg-gray-50  cursor-pointer"
-                      onClick={() => handleTaskClick(task)}
-                    >
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900 ">
-                          {task.data().Task.title}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-600 ">
-                          {task.data().Task.assigne}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            task.data().Task.status === "completed"
-                              ? "bg-green-100 text-green-800"
-                              : task.data().Task.status === "in-progress"
-                              ? "bg-yellow-100 text-yellow-800"
-                              : "bg-red-100 text-red-800"
-                          }`}
-                        >
-                          {task.data().Task.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
+                  {tasks.map((task: any) => {
+                    let taskData = task.data();
+                    return (
+                      <tr
+                        key={task.id}
+                        className="hover:bg-gray-50  cursor-pointer"
+                        onClick={() => handleTaskClick(task)}
+                      >
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900 ">
+                            {taskData.title}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-600 ">
+                            {taskData.assigne}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span
+                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                              taskData.status === "completed"
+                                ? "bg-green-100 text-green-800"
+                                : taskData.status === "in-progress"
+                                ? "bg-yellow-100 text-yellow-800"
+                                : "bg-red-100 text-red-800"
+                            }`}
+                          >
+                            {taskData.status}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

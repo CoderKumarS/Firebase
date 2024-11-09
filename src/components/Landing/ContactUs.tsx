@@ -9,6 +9,7 @@ const ContactUs: React.FC = () => {
     e.preventDefault();
     // Handle form submission logic here
     console.log({ name, email, message });
+    
   };
 
   return (

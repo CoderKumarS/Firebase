@@ -1,26 +1,39 @@
-"use client";
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { io, Socket } from "socket.io-client";
 
 const Chat: React.FC = () => {
   const [message, setMessage] = useState("");
-  const [receivedMessage, setReceivedMessage] = useState("");
+  const [receivedMessages, setReceivedMessages] = useState<string[]>([]);
   const [alert, setAlert] = useState({
     visible: false,
     message: "",
     color: "",
   });
 
-  const socket: Socket = io("http://localhost:3000");
+  // Use useRef to persist socket connection across renders
+  const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
-    socket.on("reci_message", (data) => {
-      setReceivedMessage(data.message);
-      setMessage("");
+    // Create socket connection only once when component mounts
+    socketRef.current = io("http://localhost:3000");
+
+    // Listen for messages from the server
+    socketRef.current.on("reci_message", (data) => {
+      console.log("Socket connected");
+      console.log("Received message:", data); // Log the data being received
+      if (data && data.message) {
+        setReceivedMessages((prevMessages) => [data.message, ...prevMessages]);
+      } else {
+        console.error("Message format is incorrect:", data);
+      }
     });
-  }, [socket]);
+
+    // Cleanup socket connection when component unmounts
+    return () => {
+      socketRef.current?.disconnect();
+    };
+  }, []); // Empty dependency array ensures this runs only once
 
   useEffect(() => {
     if (alert.visible) {
@@ -40,7 +53,13 @@ const Chat: React.FC = () => {
       });
       return;
     }
-    socket.emit("send_message", { message });
+
+    // Emit message to server using socketRef.current
+    if (socketRef.current) {
+      socketRef.current.emit("send_message", { message });
+    } else {
+      console.error("Socket is not connected.");
+    }
   };
 
   return (
@@ -48,7 +67,7 @@ const Chat: React.FC = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="h-[calc(100dvh-4rem)]  bg-gradient-to-br from-blue-100 to-purple-100 flex flex-col items-center justify-center p-4"
+      className="h-[calc(100dvh-4rem)] bg-gradient-to-br from-blue-100 to-purple-100 flex flex-col items-center justify-center p-4"
     >
       <AnimatePresence>
         {alert.visible && (
@@ -115,17 +134,33 @@ const Chat: React.FC = () => {
       </motion.div>
 
       <motion.div
-        className="mt-8 w-full max-w-md bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg rounded-xl p-6 shadow-xl"
+        className="mt-8 w-full max-w-md bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg rounded-xl p-6 pb-2 shadow-xl"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2 }}
       >
         <h2 className="text-xl font-semibold mb-2 text-gray-800">
-          Received Message:
+          Received Messages:
         </h2>
-        <p className="text-gray-600 break-words">
-          {receivedMessage || "No messages yet"}
-        </p>
+        <div
+          className="space-y-2 overflow-y-auto h-4/6 max-h-56"
+          id="messageBar"
+        >
+          {receivedMessages.length === 0 ? (
+            <p className="text-gray-600">No messages yet</p>
+          ) : (
+            receivedMessages.map((msg, index) => (
+              <div
+                key={index}
+                className={`p-2 rounded-md ${
+                  index === 0 ? "bg-gray-800 text-white" : "bg-gray-200"
+                }`}
+              >
+                {msg}
+              </div>
+            ))
+          )}
+        </div>
       </motion.div>
     </motion.div>
   );

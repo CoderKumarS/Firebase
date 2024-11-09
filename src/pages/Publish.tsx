@@ -3,10 +3,12 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useFirebase } from "../module/firebase";
+import { useNavigate } from "react-router-dom";
 
 interface Task {
   title: string;
   status: string;
+  priority?: string;
   description: string;
   assigne: string;
   created: Date;
@@ -20,9 +22,11 @@ interface Alert {
 
 const Publish: React.FC = () => {
   const firebase = useFirebase();
+  const navigate = useNavigate();
   const [Task, setTask] = useState<Task>({
     title: "",
-    status: "low", // Default to "low"
+    priority: "low", // Default to "low"
+    status: "incomplete", // Default to "incomplete"
     description: "",
     assigne: "",
     created: new Date(Date.now()),
@@ -43,7 +47,9 @@ const Publish: React.FC = () => {
   }, [alert.visible]);
 
   const handleElement = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => {
     const { id, value } = e.target;
     setTask((prev) => ({ ...prev, [id]: value }));
@@ -53,7 +59,13 @@ const Publish: React.FC = () => {
     e.preventDefault();
     setIsSubmitting(true);
     // Check if all required fields are filled
-    if (!Task.status || !Task.description || !Task.title || !Task.assigne) {
+    if (
+      !Task.status ||
+      !Task.priority ||
+      !Task.description ||
+      !Task.title ||
+      !Task.assigne
+    ) {
       setAlert({
         visible: true,
         message: "All fields are required",
@@ -61,12 +73,13 @@ const Publish: React.FC = () => {
       });
       return;
     }
-
     try {
-      // Attempt to save the task to Firestore
-      const element = await firebase.putDataFirestore(Task);
-      console.log(element);
+      if (!firebase.isLoggedIn) {
+        navigate("/login");
+        return;
+      }
 
+      const element = await firebase.putDataFirestore(Task);
       if (element) {
         // On success, display success message
         setAlert({
@@ -75,7 +88,14 @@ const Publish: React.FC = () => {
           color: "green",
         });
         // Clear the form
-        setTask({ title: "", status: "low", description: "", assigne: "" });
+        setTask({
+          title: "",
+          priority: "low",
+          status: "incomplete",
+          description: "",
+          assigne: "",
+          created: new Date(Date.now()),
+        });
       }
     } catch (error: any) {
       // On error, display error message
@@ -94,7 +114,7 @@ const Publish: React.FC = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="h-[calc(100dvh-4rem)] bg-gradient-to-br from-blue-100 to-purple-100 flex flex-col items-center justify-center p-4"
+      className="h-[calc(100dvh-4rem)] min-h-max bg-gradient-to-br from-blue-100 to-purple-100 flex flex-col items-center justify-center p-4"
     >
       <AnimatePresence>
         {alert.visible && (
@@ -181,14 +201,14 @@ const Publish: React.FC = () => {
 
           <div>
             <label
-              htmlFor="status"
+              htmlFor="priority"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Status
+              Priority
             </label>
             <select
-              id="status"
-              value={Task.status}
+              id="priority"
+              value={Task.priority}
               onChange={handleElement}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >

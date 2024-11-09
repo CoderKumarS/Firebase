@@ -70,3 +70,7 @@
         stroke-width: 2;
     }
 }
+
+#messageBar::-webkit-scrollbar {
+    display: none;
+}

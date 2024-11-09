@@ -92,7 +92,7 @@ function App() {
   }, []);
 
   return (
-    <div className="w-full h-full relative">
+    <div className="w-full h-full relative bg-gray-800">
       <NavBar />
       <Routes>
         <Route path="/" element={<Home />} />

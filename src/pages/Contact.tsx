@@ -25,7 +25,7 @@ export default function Contact() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="h-[calc(100dvh-4rem)] flex items-center justify-center bg-gradient-to-br from-purple-100 via-pink-100 to-red-100"
+      className="h-[calc(100dvh-4rem)] min-h-max flex items-center justify-center bg-gradient-to-br from-purple-100 via-pink-100 to-red-100"
     >
       <motion.div
         ref={formRef}

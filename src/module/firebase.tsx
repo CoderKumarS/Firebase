@@ -99,6 +99,20 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
     // Create a reference under which you want to list
     return getDocs(collection(firestore, "Task"));
   };
+  const updateTask = async (taskId: string, action: "complete" | "fail") => {
+    try {
+      // Update the task status in Firestore
+      const taskRef = doc(firestore, "Task", taskId); // Replace "tasks" with your collection name
+      await updateDoc(taskRef, {
+        status: action === "complete" ? "completed" : "failed",
+      });
+      return true; // Indicate success
+    } catch (error) {
+      console.error("Error updating task:", error);
+      return false;
+    }
+  };
+
   // Function to put data into Firebase database
   const putData = (key: string, data: any) => {
     set(ref(database, key), data);
@@ -183,8 +197,13 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
   };
   const putDataFirestore = async (Task: any) => {
     try {
+      console.log(Task);
       const data = await addDoc(collection(firestore, "Task"), {
-        Task,
+        title: Task.title,
+        status: Task.status,
+        description: Task.description,
+        assigne: Task.assigne,
+        created: Task.created,
       });
       return data;
     } catch (error) {
@@ -204,6 +223,7 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
         signinUserWithEmailAndPassword,
         signinUserWithGoogle,
         listAllTask,
+        updateTask,
         putData,
         putUserDataFirestore,
         updateUserDataFirestore,
