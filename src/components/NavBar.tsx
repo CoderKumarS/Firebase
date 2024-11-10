@@ -68,7 +68,7 @@ const NavBar = () => {
           <div className="flex items-center">
             <motion.div className="flex-shrink-0" variants={itemVariants}>
               <NavLink to="/">
-                <img className="h-8 w-8" src="/logo.png" alt="Logo" />
+                <img className="h-16 w-16 mt-2" src="/logo.png" alt="Logo" />
               </NavLink>
             </motion.div>
             <div className="hidden md:block">
