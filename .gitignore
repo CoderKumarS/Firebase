@@ -26,3 +26,7 @@ dist-ssr
 .hintrc
 
 src/module/resend.ts
+src/pages/Performance.tsx
+src/pages/TaskMangement.tsx
+src/pages/TimeTracking.tsx
+src/pages/Check.tsx
