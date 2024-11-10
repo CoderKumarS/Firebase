@@ -11,6 +11,13 @@ interface User {
   email: string;
   profilePicture?: string;
 }
+interface selectedUser {
+  joinDate?: string;
+  department: string;
+  email: string;
+  position: string;
+  name: string;
+}
 interface Props {
   user: User;
 }
@@ -31,7 +38,9 @@ export default function AdminDashboard({ user }: Props) {
   const [isTaskInfoModalOpen, setIsTaskInfoModalOpen] = useState(false);
   const [isEmployeeInfoModalOpen, setIsEmployeeInfoModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [selectedEmployee, setSelectedEmployee] = useState<selectedUser | null>(
+    null
+  );
   const stats = [
     { title: "Total Employees", value: 145, icon: Users },
     { title: "New Hires", value: 23, icon: Plus },

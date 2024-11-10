@@ -24,3 +24,5 @@ dist-ssr
 *.sw?
 .env
 .hintrc
+
+src/module/resend.ts
