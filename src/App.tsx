@@ -13,10 +13,10 @@ import Profile from "./pages/Profile";
 import "./App.css";
 import AboutPage from "./pages/About";
 import ProfileEditPage from "./pages/Edit";
-import PerformanceReview from "./pages/Performance";
-import TimeTracking from "./pages/TimeTracking";
-import TaskManagement from "./pages/TaskMangement";
-import Component from "./pages/Check";
+// import PerformanceReview from "./pages/Performance";
+// import TimeTracking from "./pages/TimeTracking";
+// import TaskManagement from "./pages/TaskMangement";
+// import Component from "./pages/Check";
 
 const items = [
   "New York",
@@ -104,7 +104,7 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/editProfile/:id" element={<ProfileEditPage />} />
-        <Route path="/check" element={<Component />} />
+        {/* <Route path="/check" element={<Component />} /> */}
         {/* <Route path="/tasks" element={<TaskManagement />} /> */}
         {/* <Route path="/time-tracking" element={<TimeTracking />} /> */}
         {/* <Route path="/performance-review" element={<PerformanceReview />} /> */}
