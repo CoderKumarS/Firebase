@@ -120,7 +120,7 @@ function App() {
       ></div>
       <svg
         id="svgCursor"
-        className="fixed top-0 left-0 w-full h-full pointer-events-none"
+        className="fixed top-0 left-0 w-full h-full pointer-events-none hidden sm:block"
       >
         <defs>
           <linearGradient id="tailGradient" x1="0%" y1="0%" x2="100%" y2="0%">
