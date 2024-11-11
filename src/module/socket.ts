@@ -4,6 +4,6 @@ import { io } from "socket.io-client";
 const URL =
   process.env.NODE_ENV === "production"
     ? undefined
-    : import.meta.env.VITE_FIREBASE_NODE_ENV;
+    : import.meta.env.VITE_NODE_ENV;
 
 export const socket = io(URL);

@@ -16,7 +16,7 @@ const Chat: React.FC = () => {
 
   useEffect(() => {
     // Create socket connection only once when component mounts
-    socketRef.current = io("http://localhost:3000");
+    socketRef.current = io(import.meta.env.VITE_NODE_ENV);
 
     // Listen for messages from the server
     socketRef.current.on("reci_message", (data) => {
