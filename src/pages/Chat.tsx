@@ -20,8 +20,6 @@ const Chat: React.FC = () => {
 
     // Listen for messages from the server
     socketRef.current.on("reci_message", (data) => {
-      console.log("Socket connected");
-      console.log("Received message:", data); // Log the data being received
       if (data && data.message) {
         setReceivedMessages((prevMessages) => [data.message, ...prevMessages]);
       } else {
