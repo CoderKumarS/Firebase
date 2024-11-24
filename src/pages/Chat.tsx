@@ -2,8 +2,12 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { io, Socket } from "socket.io-client";
 
+interface Messaage {
+  message: string;
+  time: string;
+}
 const Chat: React.FC = () => {
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState<Messaage | null>();
   const [receivedMessages, setReceivedMessages] = useState<string[]>([]);
   const [alert, setAlert] = useState({
     visible: false,
@@ -21,7 +25,11 @@ const Chat: React.FC = () => {
     // Listen for messages from the server
     socketRef.current.on("reci_message", (data) => {
       if (data && data.message) {
-        setReceivedMessages((prevMessages) => [data.message, ...prevMessages]);
+        setReceivedMessages((prevMessages) => [
+          `${data.message} - ${data.time}`,
+          ...prevMessages,
+        ]);
+        // setReceivedMessages((prevMessages) => [data.message, ...prevMessages]);
       } else {
         console.error("Message format is incorrect:", data);
       }
@@ -43,7 +51,7 @@ const Chat: React.FC = () => {
   }, [alert]);
 
   const sendMessage = () => {
-    if (message === "") {
+    if (message?.message === "") {
       setAlert({
         visible: true,
         message: "Please enter a message",
